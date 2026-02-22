@@ -1,14 +1,25 @@
-import { useState } from "react"
+import Table from './Table'
+import { useEffect, useState } from "react"
 
 const Manager = () => {
     const [showPass, setshowPass] = useState("bi-eye-fill")
     const [form, setform] = useState({ site: "", username: "", password: "" })
+    const [PasswordArray, setPasswordArray] = useState([])
+
+    useEffect(() => {
+        let passwords = localStorage.getItem("password")
+        if (passwords) {
+            setPasswordArray(JSON.parse(passwords))
+        }
+    }, [])
 
     const handleChange = (e) => {
         setform({ ...form, [e.target.name]: e.target.value })
     }
     const handleSubmit = () => {
-        console.log(form)
+        const newArray = [...PasswordArray, form]
+        setPasswordArray(newArray)
+        localStorage.setItem("password", JSON.stringify(newArray))
     }
 
     const showPassword = () => {
@@ -19,13 +30,13 @@ const Manager = () => {
     }
     return (
         <>
-            <div className="absolute inset-0 -z-10 h-full w-full bg-purple-50 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-size-[6rem_4rem]"><div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_100%_400px,#e4a3f599,transparent)]"></div></div>
+            <div className="absolute inset-0 -z-10 h-full w-full bg-purple-50 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-size-[6rem_4rem]"><div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_500px_at_100%_400px,#e5b9f199,transparent)]"></div></div>
             <div className="w-4xl mx-auto">
                 <div className="flex flex-col justify-center items-center py-4 my-5">
                     <h1 className="flex font-semibold font-serif text-2xl"><span className="text-[#007773]">&lt; Pass</span><span>End /&gt;</span></h1>
                     <p className='font-sans font-semibold text-xl'>Your own password manager</p>
                 </div>
-                <div className="flex flex-col gap-6 items-center">
+                <div className="flex flex-col mb-9 gap-6 items-center">
                     <div className="my-2 w-full">
                         <input type="text" name="site" id="" placeholder="Enter website URL" className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" onChange={handleChange} />
                     </div>
@@ -35,16 +46,17 @@ const Manager = () => {
                         <i className={`bi ${showPass}
                         text-2xl absolute top-1 right-2 cursor-pointer`} onClick={showPassword} ></i>
                     </div>
-                    <button type="submit" className="flex items-center cursor-pointer bg-[#c68bfe] hover:bg-purple-400 duration-150 w-fit rounded-3xl px-4 py-1.5 font-sans font-semibold text-2xs gap-0.5"
+                    <button type="submit" className="flex items-center cursor-pointer bg-[#c68bfe] hover:bg-purple-400 duration-150 w-fit rounded-3xl px-4 py-1.5 gap-1.5"
                         onClick={handleSubmit}
-                    >Add Password
-                        <lord-icon
-                            src="https://cdn.lordicon.com/efxgwrkc.json"
-                            trigger="hover"
-                            style={{ width: "30px", height: "30px" }}>
+                    > <lord-icon
+                        src="https://cdn.lordicon.com/efxgwrkc.json"
+                        trigger="hover"
+                        style={{ width: "30px", height: "30px" }}>
                         </lord-icon>
+                        <span className="font-serif font-semibold text-lg">Save</span>
                     </button>
                 </div>
+                <Table />
             </div>
         </>
     )
