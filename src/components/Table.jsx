@@ -18,13 +18,15 @@ const table = (props) => {
     }
 
     const deletePassword = (m) => {
-        props.setPasswordArray(passwordData.filter(item => item.id!=m))
-        localStorage.setItem("password", JSON.stringify(passwordData.filter(item => item.id!=m)))
+        props.setPasswordArray(passwordData.filter(item => item.id != m))
+        localStorage.setItem("password", JSON.stringify(passwordData.filter(item => item.id != m)))
     }
-    const editPassword = (m) => {
-        props.setform(passwordData.filter(e=>e.id===m)[1])
-        props.setPasswordArray(passwordData.filter(item => item.id!==m))
-        console.log(m)
+
+    const editPassword = (id) => {
+        console.log("Editing password with id ", id)
+        let editarr = passwordData.filter(i => i.id === id)[0]
+        props.setform(editarr)
+        props.setPasswordArray(passwordData.filter(item => item.id !== id))
     }
 
     return (

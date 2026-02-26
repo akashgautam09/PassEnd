@@ -1,6 +1,7 @@
 import Table from './Table'
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
 
 const Manager = () => {
     const [showPass, setshowPass] = useState("bi-eye-fill")
@@ -22,6 +23,17 @@ const Manager = () => {
         const newArray = [...PasswordArray, { ...form, id: uuidv4() }]
         setPasswordArray(newArray)
         localStorage.setItem("password", JSON.stringify(newArray))
+        setform({ site: "", username: "", password: "" })
+        toast.success('Saved successfully!', {
+            position: "bottom-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+        });
     }
 
     const showPassword = () => {
@@ -43,11 +55,11 @@ const Manager = () => {
                 </div>
                 <div className="flex flex-col mb-2 gap-6 items-center">
                     <div className="my-2 w-full">
-                        <input type="text" name="site" id="" placeholder="Enter website URL" className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" onChange={handleChange} />
+                        <input type="text" name="site" id="" value={form.site} placeholder="Enter website URL" className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" onChange={handleChange} />
                     </div>
                     <div className="flex justify-between relative gap-3 w-full">
-                        <input type="text" name="username" id="" placeholder="Enter Username" className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-2/3" onChange={handleChange} />
-                        <input type={Passtype} name="password" id="" placeholder="Enter Password" required className="font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-1/3" onChange={handleChange} />
+                        <input type="text" name="username" id="" value={form.username} placeholder="Enter Username" className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-2/3" onChange={handleChange} />
+                        <input type={Passtype} name="password" id="" value={form.password} placeholder="Enter Password" required className="font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-1/3" onChange={handleChange} />
                         <i className={`bi ${showPass}
                         text-2xl absolute top-1 right-2 cursor-pointer`} onClick={showPassword} ></i>
                     </div>
