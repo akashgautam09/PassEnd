@@ -2,6 +2,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 const table = (props) => {
     let passwordData = props.PasswordArray;
+    let form = props.form;
 
     const copytext = (text) => {
         navigator.clipboard.writeText(text)
@@ -17,15 +18,31 @@ const table = (props) => {
         });
     }
 
-    const deletePassword = (m) => {
-        props.setPasswordArray(passwordData.filter(item => item.id != m))
-        localStorage.setItem("password", JSON.stringify(passwordData.filter(item => item.id != m)))
+    const deletePassword = async (m) => {
+        let c = confirm("Do you really want to delete password !")
+        if (c) {
+            props.setPasswordArray(passwordData.filter(item => item.id !== m))
+            await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id:m }) })
+
+            console.log(m)
+            // localStorage.setItem("password", JSON.stringify(passwordData.filter(item => item.id != m)))
+            toast.success('Password deleted !', {
+                position: "bottom-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
     }
 
     const editPassword = (id) => {
         console.log("Editing password with id ", id)
         let editarr = passwordData.filter(i => i.id === id)[0]
-        props.setform(editarr)
+        props.setform({...editarr,id:form.id})
         props.setPasswordArray(passwordData.filter(item => item.id !== id))
     }
 
