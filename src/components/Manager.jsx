@@ -2,39 +2,48 @@ import Table from './Table'
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
+import { useUser } from '@clerk/clerk-react';
 
 const Manager = () => {
+    const { user } = useUser();
     const [showPass, setshowPass] = useState("bi-eye-fill")
     const [form, setform] = useState({ site: "", username: "", password: "" })
     const [PasswordArray, setPasswordArray] = useState([])
     const [Passtype, setPasstype] = useState("password")
 
     const getPassword = async () => {
-        let res = await fetch('http://localhost:3000/')
+        if (!user || !user.id) return;
+
+        let res = await fetch(`http://localhost:3000/?userId=${user.id}`)
         let passwords = await res.json()
         setPasswordArray(passwords)
     }
 
     useEffect(() => {
-        getPassword()
-    }, [])
+        if (user && user.id) {
+            getPassword()
+        }
+    }, [user])
 
     const handleChange = (e) => {
         setform({ ...form, [e.target.name]: e.target.value })
     }
     const handleSubmit = async () => {
-        const newArray = [...PasswordArray, { ...form, id: uuidv4() }]
+        const id = uuidv4();
+        const newArray = [...PasswordArray, { ...form, id: id, userId: user.id }]
         setPasswordArray(newArray)
 
-        await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id }) })
+        await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id, userId: user.id }) })
 
         await fetch('http://localhost:3000/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ ...form, id: uuidv4() })
+            body: JSON.stringify({ ...form, id, userId: user.id })
         })
+
+        await getPassword();
         // localStorage.setItem("password", JSON.stringify(newArray))
         setform({ site: "", username: "", password: "" })
         toast.success('Saved successfully!', {

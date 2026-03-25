@@ -1,7 +1,8 @@
+const { clerkMiddleware, requireAuth } = require('@clerk/express');
 const express = require('express')
+require('dotenv').config()
 const { MongoClient } = require('mongodb');
 const cors = require('cors')
-require('dotenv').config()
 const app = express()
 const port = 3000
 
@@ -16,26 +17,28 @@ const dbName = 'PassEnd';
 client.connect();
 
 app.get('/', async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) return res.status(400).json({ error: "User ID is required" });
   const db = client.db(dbName);
   const collection = db.collection('passwords');
-  const findResult = await collection.find({}).toArray();
+  const findResult = await collection.find({ userId: userId }).toArray();
   res.json(findResult)
 })
 
 app.post('/', async (req, res) => {
-  const passwords = req.body
+  const passwordData = req.body;
   const db = client.db(dbName);
   const collection = db.collection('passwords');
-  const insertResult = await collection.insertOne(passwords);
+  const insertResult = await collection.insertOne(passwordData);
   res.send({ success: true, result: insertResult })
 })
 
 app.delete('/', async (req, res) => {
-  const passwords = req.body
+  const { id, userId } = req.body;
   const db = client.db(dbName);
   const collection = db.collection('passwords');
-  const deletedResult = await collection.deleteOne(passwords);
-  res.send({ success: true, result: deletedResult })
+  const deleteResult = await collection.deleteOne({ id: id, userId: userId });
+  res.send({ success: true, result: deleteResult })
 })
 
 app.listen(port, () => {
