@@ -8,16 +8,7 @@ const table = (props) => {
 
     const copytext = (text) => {
         navigator.clipboard.writeText(text)
-        toast.success('Copied successfully!', {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-        });
+        toast.success('Copied successfully!');
     }
 
     const deletePassword = async (m) => {
@@ -26,17 +17,7 @@ const table = (props) => {
             props.setPasswordArray(passwordData.filter(item => item.id !== m))
             await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: m, userId: user.id }) })
 
-            // localStorage.setItem("password", JSON.stringify(passwordData.filter(item => item.id != m)))
-            toast.success('Password deleted !', {
-                position: "bottom-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
+            toast.success('Password deleted !');
         }
     }
 

@@ -1,4 +1,4 @@
-import { SignedOut, SignInButton, UserButton, SignedIn } from "@clerk/clerk-react";
+import { SignedOut, SignInButton, SignUpButton, UserButton, SignedIn } from "@clerk/clerk-react";
 
 const Navbar = () => {
   return (
@@ -6,13 +6,22 @@ const Navbar = () => {
       <div className="flex font-semibold font-serif text-xl md:text-2xl"><span className="text-[#007773]">&lt; Pass</span><span>End /&gt;</span></div>
       <div className="flex items-center justify-center">
         <SignedOut>
-          <SignInButton mode="modal">
-            <button className="font-semibold cursor-pointer text-transparent bg-clip-text bg-linear-to-r from-[#007773] to-black font-serif text-xl ">Sign In</button>
-          </SignInButton>
+          <ul className="flex gap-3">
+            <li>
+              <SignInButton mode="modal">
+                <button className="font-semibold cursor-pointer text-transparent bg-clip-text bg-linear-to-r from-[#007773] to-black font-serif text-lg ">Sign In</button>
+              </SignInButton>
+              </li>
+            <li>
+              <SignUpButton mode="modal">
+                <button className="font-semibold cursor-pointer text-transparent bg-clip-text bg-linear-to-r from-[#007773] to-black font-serif text-lg ">Sign Up</button>
+              </SignUpButton>
+              </li>
+          </ul>
         </SignedOut>
         <SignedIn>
           <button className="pt-0.5">
-          <UserButton />
+            <UserButton />
           </button>
         </SignedIn>
       </div>

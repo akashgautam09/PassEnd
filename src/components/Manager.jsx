@@ -44,18 +44,8 @@ const Manager = () => {
         })
 
         await getPassword();
-        // localStorage.setItem("password", JSON.stringify(newArray))
         setform({ site: "", username: "", password: "" })
-        toast.success('Saved successfully!', {
-            position: "bottom-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-        });
+        toast.success('Saved successfully!');
     }
 
     const showPassword = () => {

@@ -15,15 +15,14 @@ const App = () => {
 
         <SignedOut>
           <div className="flex flex-col justify-center items-center min-h-[85vh] px-4">
-            {/* Glassmorphism Card */}
-            <div className="bg-white/40 backdrop-blur-lg border border-white/50 shadow-2xl rounded-4xl p-8 md:p-12 max-w-lg w-full text-center relative overflow-hidden">
+ 
+             <div className="bg-white/40 backdrop-blur-lg border border-white/50 shadow-2xl rounded-4xl p-8 md:p-12 max-w-lg w-full text-center relative overflow-hidden">
 
-              {/* Animated Background Glows inside the card */}
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '2s' }}></div>
 
               <div className="relative z-10 flex flex-col items-center">
-                {/* Security Icon */}
+                
                 <div className="bg-linear-to-br from-purple-100 to-purple-300 p-4 rounded-full shadow-inner mb-6">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="#581c87" className="w-12 h-12">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
