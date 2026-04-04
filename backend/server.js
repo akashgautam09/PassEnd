@@ -1,8 +1,8 @@
-const { clerkMiddleware, requireAuth } = require('@clerk/express');
-const express = require('express')
 require('dotenv').config()
+const express = require('express')
 const { MongoClient } = require('mongodb');
 const cors = require('cors')
+const { encrypt, decrypt } = require('./crypto');
 const app = express()
 const port = 3000
 
@@ -17,21 +17,41 @@ const dbName = 'PassEnd';
 client.connect();
 
 app.get('/', async (req, res) => {
-  const userId = req.query.userId;
-  if (!userId) return res.status(400).json({ error: "User ID is required" });
-  const db = client.db(dbName);
-  const collection = db.collection('passwords');
-  const findResult = await collection.find({ userId: userId }).toArray();
-  res.json(findResult)
-})
+  try {
+    const userId = req.query.userId;
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    const db = client.db(dbName);
+    const collection = db.collection('passwords');
+    const findResult = await collection.find({ userId: userId }).toArray();
+    // Decrypt the passwords before sending to React
+    const decryptedPasswords = findResult.map(item => {
+      return {
+        ...item,
+        site: decrypt(item.site),
+        username: decrypt(item.username),
+        password: decrypt(item.password)
+      }
+    });
+    res.json(decryptedPasswords);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch" });
+  }
+});
 
 app.post('/', async (req, res) => {
-  const passwordData = req.body;
-  const db = client.db(dbName);
-  const collection = db.collection('passwords');
-  const insertResult = await collection.insertOne(passwordData);
-  res.send({ success: true, result: insertResult })
-})
+  try {
+    const passwordData = req.body;
+    passwordData.site = encrypt(passwordData.site);
+    passwordData.username = encrypt(passwordData.username);
+    passwordData.password = encrypt(passwordData.password);
+    const db = client.db(dbName);
+    const collection = db.collection('passwords');
+    const insertResult = await collection.insertOne(passwordData);
+    res.send({ success: true, result: insertResult })
+  } catch (error) {
+    res.status(500).json({ error: "Failed to save" });
+  }
+});
 
 app.delete('/', async (req, res) => {
   const { id, userId } = req.body;

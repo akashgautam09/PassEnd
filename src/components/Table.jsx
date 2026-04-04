@@ -4,7 +4,6 @@ import { useUser } from '@clerk/clerk-react';
 const table = (props) => {
     const { user } = useUser();
     let passwordData = props.PasswordArray;
-    let form = props.form;
 
     const copytext = (text) => {
         navigator.clipboard.writeText(text)
@@ -29,7 +28,7 @@ const table = (props) => {
     }
 
     return (
-        <div className="">
+        <div>
             <ToastContainer
                 position="bottom-right"
                 autoClose={3000}

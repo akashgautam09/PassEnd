@@ -62,7 +62,7 @@ const Manager = () => {
         <div className="md:w-4xl flex flex-col relative mx-auto px-2">
             <div className="flex flex-col justify-center items-center py-4 my-5">
                 <h1 className="flex font-semibold font-serif text-2xl"><span className="text-[#007773]">&lt; Pass</span><span>End /&gt;</span></h1>
-                <p className='font-sans font-semibold text-xl'>Your own password manager</p>
+                <p className='font-sans font-semibold text-xl'>Your Own Password Manager</p>
             </div>
             <div className="flex flex-col mb-2 gap-6 items-center">
                 <div className="md:my-2 w-full">
