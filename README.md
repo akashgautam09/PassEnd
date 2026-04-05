@@ -1,4 +1,4 @@
-# Password Manager
+# PassEnd : Your Own Password Manager
 
 A full-stack Password Manager application that securely stores user credentials using MongoDB.  
 Users can add, edit, copy, and delete saved passwords through a clean and responsive interface.
@@ -38,7 +38,7 @@ Passwords are stored securely in MongoDB collections.
 
 ## Live Demo
 
-https://akashgautam09.github.io/PassEnd/
+https://passend.vercel.app
 
 ---
 
