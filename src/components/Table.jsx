@@ -2,6 +2,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useUser } from '@clerk/clerk-react';
 
 const table = (props) => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const { user } = useUser();
     let passwordData = props.PasswordArray;
 
@@ -14,7 +15,7 @@ const table = (props) => {
         let c = confirm("Do you really want to delete password !")
         if (c) {
             props.setPasswordArray(passwordData.filter(item => item.id !== m))
-            await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: m, userId: user.id }) })
+            await fetch(`${API_URL}/`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: m, userId: user.id }) })
 
             toast.success('Password deleted !');
         }

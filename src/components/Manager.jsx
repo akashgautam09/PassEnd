@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useUser } from '@clerk/clerk-react';
 
 const Manager = () => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const { user } = useUser();
     const [showPass, setshowPass] = useState("bi-eye-fill")
     const [form, setform] = useState({ site: "", username: "", password: "" })
@@ -14,7 +15,7 @@ const Manager = () => {
     const getPassword = async () => {
         if (!user || !user.id) return;
 
-        let res = await fetch(`http://localhost:3000/?userId=${user.id}`)
+        let res = await fetch(`${API_URL}/?userId=${user.id}`)
         let passwords = await res.json()
         setPasswordArray(passwords)
     }
@@ -33,9 +34,9 @@ const Manager = () => {
         const newArray = [...PasswordArray, { ...form, id: id, userId: user.id }]
         setPasswordArray(newArray)
 
-        await fetch("http://localhost:3000/", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id, userId: user.id }) })
+        await fetch(`${API_URL}/`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id, userId: user.id }) })
 
-        await fetch('http://localhost:3000/', {
+        await fetch(`${API_URL}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

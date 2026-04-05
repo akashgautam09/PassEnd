@@ -4,17 +4,34 @@ const { MongoClient } = require('mongodb');
 const cors = require('cors')
 const { encrypt, decrypt } = require('./crypto');
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.use(express.json())
-app.use(cors())
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://your-passend-app.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}))
 
 // Connection URL
 const client = new MongoClient(process.env.MONGO_URI);
 
 // Database Name
 const dbName = 'PassEnd';
-client.connect();
+
+client.connect()
+  .then(() => console.log("Successfully connected to MongoDB"))
+  .catch(err => console.error("MongoDB connection error:", err));
 
 app.get('/', async (req, res) => {
   try {
