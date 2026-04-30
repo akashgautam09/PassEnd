@@ -1,76 +1,95 @@
-# Password Manager
+🔐 PassEnd – Your Own Password Manager
 
-A full-stack Password Manager application that securely stores user credentials using MongoDB.  
-Users can add, edit, copy, and delete saved passwords through a clean and responsive interface.
-
----
-
-## Features
-
--  Add new website credentials
--  Edit saved passwords
--  Copy username/password instantly
--  Delete stored credentials
--  Data stored in MongoDB database
--  Fast and responsive UI
+PassEnd is a full-stack password manager that enables users to securely store and manage their credentials. Built using the MERN stack, it offers a responsive interface along with essential features for efficient password handling.
 
 ---
 
-## Tech Stack
+Features
 
-Frontend:
-- React (Vite)
-- JavaScript
-- CSS / Bootstrap
-
-Backend:
-- Node.js
-- Express.js
-- MongoDB
+* **Secure Credential Storage** – Store and manage website credentials in a structured vault
+* **Edit & Delete Support** – Easily update or remove saved entries
+* **Copy Functionality** – One-click copy for usernames and passwords
+* **Password Visibility Toggle** – Show or hide passwords when needed
+* **User Notifications** – Real-time feedback using toast notifications
+* **Responsive UI** – Clean and modern interface built with Tailwind CSS
 
 ---
 
-## Database
+🛠 Tech Stack
 
-Passwords are stored securely in MongoDB collections.
+Frontend
+
+* React (Vite)
+* Tailwind CSS
+* Clerk (Authentication)
+
+Backend
+
+* Node.js
+* Express.js
+* MongoDB (Native Driver)
+* Clerk (Backend Authentication)
 
 ---
 
-## Live Demo
-
-https://akashgautam09.github.io/PassEnd/
+**Live Demo :** [View the application →](https://passend.vercel.app)
 
 ---
 
-## Installation & Setup
+⚙️ Installation & Setup
 
-Clone the repository:
+1. Clone the Repository
 
+```bash
 git clone https://github.com/akashgautam09/PassEnd.git
+cd PassEnd
+```
 
-Install dependencies:
+2. Install Dependencies
 
+```bash
 npm install
+```
 
-Start backend server:
+3. Environment Variables
 
-node server.js
+Create a `.env` file inside the **backend folder**:
 
-Start frontend:
+```
+backend/.env
+```
 
+Add the following variables:
+
+```env
+MONGO_URI=your_mongodb_connection_string
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+```
+
+For the frontend, create a separate `.env` file in the root directory:
+
+```
+.env
+```
+
+```env
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+```
+
+4. Run the Application
+
+Start the backend server:
+
+```bash
+node backend/server.js
+```
+
+Start the frontend:
+
+```bash
 npm run dev
+```
 
----
 
-## Future Improvements
-
-- User authentication
-- Password encryption
-- Search & filter functionality
-- Cloud deployment
-
----
-
-## Author
-
-Akash Gautam
+Feedback and suggestions are welcome. You can open an issue or reach out via GitHub for any queries or improvements.
