@@ -6,9 +6,13 @@ const table = (props) => {
     const { user } = useUser();
     let passwordData = props.PasswordArray;
 
-    const copytext = (text) => {
-        navigator.clipboard.writeText(text)
-        toast.success('Copied successfully!');
+    const getIdentifierLabel = () => {
+        // Check if any entry has identifierType to determine column header
+        const hasNewFormat = passwordData.some(item => item.identifierType);
+        if (hasNewFormat) {
+            return "Account Details";
+        }
+        return "Username";
     }
 
     const deletePassword = async (m) => {
@@ -46,7 +50,7 @@ const table = (props) => {
                 <thead className="bg-purple-400 text-white">
                     <tr>
                         <th className="px-4 py-2.5 text-left text-xl">Site URL</th>
-                        <th className="px-4 py-2.5 text-left text-xl">Username</th>
+                        <th className="px-4 py-2.5 text-left text-xl">{getIdentifierLabel()}</th>
                         <th className="px-4 py-2.5 text-left text-xl">Password</th>
                         <th className="px-4 py-2.5 text-left text-xl">Actions</th>
                     </tr>
@@ -64,13 +68,17 @@ const table = (props) => {
                                     </lord-icon></span></div>
                             </td>
                             <td className="px-4 py-2">
-                                <div className='flex items-center'>
-                                    {e.username}
-                                    <span className='cursor-pointer' onClick={() => { copytext(e.username) }}><lord-icon
-                                        style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "6px" }}
-                                        src="https://cdn.lordicon.com/iykgtsbt.json"
-                                        trigger="hover" >
-                                    </lord-icon></span></div>
+                                <div className='flex items-center flex-col gap-1'>
+                                    <span className='text-xs text-gray-600'>{e.identifierType ? e.identifierType.charAt(0).toUpperCase() + e.identifierType.slice(1) : 'Username'}</span>
+                                    <div className='flex items-center'>
+                                        {e.identifier || e.username}
+                                        <span className='cursor-pointer' onClick={() => { copytext(e.identifier || e.username) }}><lord-icon
+                                            style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "6px" }}
+                                            src="https://cdn.lordicon.com/iykgtsbt.json"
+                                            trigger="hover" >
+                                        </lord-icon></span>
+                                    </div>
+                                </div>
                             </td>
                             <td className="px-4 py-2">
                                 <div className='flex items-center'>

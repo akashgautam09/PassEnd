@@ -8,7 +8,7 @@ const Manager = () => {
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
     const { user } = useUser();
     const [showPass, setshowPass] = useState("bi-eye-fill")
-    const [form, setform] = useState({ site: "", username: "", password: "" })
+    const [form, setform] = useState({ site: "", identifierType: "username", identifier: "", password: "" })
     const [PasswordArray, setPasswordArray] = useState([])
     const [Passtype, setPasstype] = useState("password")
 
@@ -29,7 +29,34 @@ const Manager = () => {
     const handleChange = (e) => {
         setform({ ...form, [e.target.name]: e.target.value })
     }
+    const validateUrl = (url) => {
+        if (!url.trim()) return false;
+        try {
+            new URL(url.startsWith('http') ? url : 'https://' + url);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     const handleSubmit = async () => {
+        if (!form.site.trim()) {
+            toast.error('Please enter a website URL');
+            return;
+        }
+        if (!validateUrl(form.site)) {
+            toast.error('Please enter a valid website URL (e.g., example.com or https://example.com)');
+            return;
+        }
+        if (!form.identifier.trim()) {
+            toast.error(`Please enter ${form.identifierType === 'phone' ? 'phone number' : form.identifierType}`);
+            return;
+        }
+        if (!form.password.trim()) {
+            toast.error('Please enter a password');
+            return;
+        }
+
         const id = uuidv4();
         const newArray = [...PasswordArray, { ...form, id: id, userId: user.id }]
         setPasswordArray(newArray)
@@ -45,7 +72,7 @@ const Manager = () => {
         })
 
         await getPassword();
-        setform({ site: "", username: "", password: "" })
+        setform({ site: "", identifierType: "username", identifier: "", password: "" })
         toast.success('Saved successfully!');
     }
 
@@ -67,14 +94,49 @@ const Manager = () => {
             </div>
             <div className="flex flex-col mb-2 gap-6 items-center">
                 <div className="md:my-2 w-full">
-                    <input type="text" name="site" id="site" value={form.site} placeholder="Enter website URL" className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" onChange={handleChange} />
+                    <input 
+                        type="text" 
+                        name="site" 
+                        id="site" 
+                        value={form.site} 
+                        placeholder="Enter website URL (e.g., example.com)" 
+                        className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" 
+                        onChange={handleChange} 
+                    />
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-5 md:gap-3 w-full">
-                    <input type="text" name="username" id="username" value={form.username} placeholder="Enter Username" className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full md:w-2/3" onChange={handleChange} />
+                    <select 
+                        name="identifierType" 
+                        id="identifierType" 
+                        value={form.identifierType} 
+                        className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full md:w-1/3" 
+                        onChange={handleChange}
+                    >
+                        <option value="username">Username</option>
+                        <option value="email">Email</option>
+                        <option value="phone">Phone Number</option>
+                    </select>
+                    <input 
+                        type={form.identifierType === 'phone' ? 'tel' : 'text'} 
+                        name="identifier" 
+                        id="identifier" 
+                        value={form.identifier} 
+                        placeholder={form.identifierType === 'phone' ? 'Enter Phone Number' : form.identifierType === 'email' ? 'Enter Email' : 'Enter Username'} 
+                        className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full md:w-1/3" 
+                        onChange={handleChange} 
+                    />
                     <span className='relative w-full md:w-1/3'>
-                        <input type={Passtype} name="password" id="password" value={form.password} placeholder="Enter Password" required className="font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full" onChange={handleChange} />
-                        <i className={`bi ${showPass}
-                        text-2xl absolute top-1 right-2 cursor-pointer`} onClick={showPassword} ></i>
+                        <input 
+                            type={Passtype} 
+                            name="password" 
+                            id="password" 
+                            value={form.password} 
+                            placeholder="Enter Password" 
+                            required 
+                            className="font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full" 
+                            onChange={handleChange} 
+                        />
+                        <i className={`bi ${showPass} text-2xl absolute top-1 right-2 cursor-pointer`} onClick={showPassword} ></i>
                     </span>
                 </div>
                 <button type="submit" className="flex items-center cursor-pointer bg-[#c68bfe] hover:bg-purple-400 duration-150 w-fit rounded-3xl px-4 py-1.5 gap-1.5"
