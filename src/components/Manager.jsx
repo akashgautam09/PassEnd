@@ -87,29 +87,29 @@ const Manager = () => {
         }
     }
     return (
-        <div className="md:w-4xl flex flex-col relative mx-auto px-2">
-            <div className="flex flex-col justify-center items-center py-4 my-5">
-                <h1 className="flex font-semibold font-serif text-2xl"><span className="text-[#007773]">&lt; Pass</span><span>End /&gt;</span></h1>
-                <p className='font-sans font-semibold text-xl'>Your Own Password Manager</p>
+        <div className="w-full max-w-4xl flex flex-col relative mx-auto px-3 sm:px-6 py-4">
+            <div className="flex flex-col justify-center items-center py-2 my-2 sm:my-4">
+                <h1 className="flex font-semibold font-serif text-2xl sm:text-3xl"><span className="text-[#007773]">&lt; Pass</span><span className="text-purple-950">End /&gt;</span></h1>
+                <p className='font-sans font-semibold text-sm sm:text-lg text-purple-900/80 text-center'>Your Own Password Manager</p>
             </div>
-            <div className="flex flex-col mb-2 gap-6 items-center">
-                <div className="md:my-2 w-full">
+            <div className="flex flex-col mb-4 gap-4 items-center w-full">
+                <div className="w-full">
                     <input 
                         type="text" 
                         name="site" 
                         id="site" 
                         value={form.site} 
                         placeholder="Enter website URL (e.g., example.com)" 
-                        className="w-full font-sans font-semibold border-2 border-purple-700 py-2 px-2 rounded-3xl opacity-50" 
+                        className="w-full font-sans font-medium border-2 border-purple-300 focus:border-purple-600 py-2 sm:py-2.5 px-4 rounded-3xl bg-white/80 backdrop-blur-sm text-purple-950 placeholder-purple-400 focus:outline-none transition-all shadow-xs" 
                         onChange={handleChange} 
                     />
                 </div>
-                <div className="flex flex-col md:flex-row justify-between items-center gap-5 md:gap-3 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 w-full">
                     <select 
                         name="identifierType" 
                         id="identifierType" 
                         value={form.identifierType} 
-                        className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full md:w-1/3" 
+                        className="text-purple-950 font-sans font-medium border-2 border-purple-300 focus:border-purple-600 rounded-3xl py-2 sm:py-2.5 px-3.5 bg-white/80 backdrop-blur-sm focus:outline-none w-full cursor-pointer transition-all shadow-xs" 
                         onChange={handleChange}
                     >
                         <option value="username">Username</option>
@@ -122,10 +122,10 @@ const Manager = () => {
                         id="identifier" 
                         value={form.identifier} 
                         placeholder={form.identifierType === 'phone' ? 'Enter Phone Number' : form.identifierType === 'email' ? 'Enter Email' : 'Enter Username'} 
-                        className="text-black font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full md:w-1/3" 
+                        className="text-purple-950 font-sans font-medium border-2 border-purple-300 focus:border-purple-600 rounded-3xl py-2 sm:py-2.5 px-4 bg-white/80 backdrop-blur-sm placeholder-purple-400 focus:outline-none w-full transition-all shadow-xs" 
                         onChange={handleChange} 
                     />
-                    <span className='relative w-full md:w-1/3'>
+                    <div className='relative w-full sm:col-span-2 md:col-span-1'>
                         <input 
                             type={Passtype} 
                             name="password" 
@@ -133,25 +133,25 @@ const Manager = () => {
                             value={form.password} 
                             placeholder="Enter Password" 
                             required 
-                            className="font-sans font-semibold border-2 border-purple-700 rounded-3xl py-2 px-2 opacity-50 w-full" 
+                            className="font-sans font-medium border-2 border-purple-300 focus:border-purple-600 rounded-3xl py-2 sm:py-2.5 pl-4 pr-10 bg-white/80 backdrop-blur-sm text-purple-950 placeholder-purple-400 focus:outline-none w-full transition-all shadow-xs" 
                             onChange={handleChange} 
                         />
-                        <i className={`bi ${showPass} text-2xl absolute top-1 right-2 cursor-pointer`} onClick={showPassword} ></i>
-                    </span>
+                        <i className={`bi ${showPass} text-xl text-purple-700 absolute top-1/2 -translate-y-1/2 right-3.5 cursor-pointer hover:text-purple-900 transition-colors`} onClick={showPassword} ></i>
+                    </div>
                 </div>
-                <button type="submit" className="flex items-center cursor-pointer bg-[#c68bfe] hover:bg-purple-400 duration-150 w-fit rounded-3xl px-4 py-1.5 gap-1.5"
+                <button type="submit" className="flex items-center justify-center cursor-pointer bg-purple-600 hover:bg-purple-700 active:scale-95 text-white duration-200 w-full sm:w-auto rounded-3xl px-8 py-2.5 gap-2 shadow-md hover:shadow-lg font-serif font-semibold text-base sm:text-lg my-1"
                     onClick={handleSubmit}
                 > <lord-icon
                     src="https://cdn.lordicon.com/efxgwrkc.json"
                     trigger="hover"
-                    style={{ width: "30px", height: "30px" }}>
+                    style={{ width: "26px", height: "26px" }}>
                     </lord-icon>
-                    <span className="font-serif font-semibold text-lg">Save</span>
+                    <span>Save Password</span>
                 </button>
-                <div className='w-full pb-3'>
-                    <h1 className='font-bold font-sans text-2xl pb-2 pt-0.5 text-center text-cyan-900'>Your Passwords</h1>
-                    <div className='min-h-[30vh] relative overflow-y-hidden'>
-                        {PasswordArray.length === 0 && <div className='font-sans font-semibold text-center'>You haven't added any password yet !</div>}
+                <div className='w-full pt-3 pb-3'>
+                    <h2 className='font-bold font-sans text-xl sm:text-2xl pb-3 pt-0.5 text-center text-purple-950'>Your Saved Vault</h2>
+                    <div className='min-h-[20vh] relative'>
+                        {PasswordArray.length === 0 && <div className='font-sans font-semibold text-center text-purple-700/80 py-8 px-4 bg-white/60 rounded-2xl border border-purple-200 shadow-xs'>You haven't added any password yet !</div>}
                         {PasswordArray.length !== 0 && <Table PasswordArray={PasswordArray} setPasswordArray={setPasswordArray} setform={setform} form={form} />}
                     </div>
                 </div>
