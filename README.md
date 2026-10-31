@@ -65,7 +65,12 @@ Add the following variables:
 MONGO_URI=your_mongodb_connection_string
 CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
+# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ENCRYPTION_KEY=64_hex_characters
 ```
+
+`ENCRYPTION_KEY` must be a stable 32-byte secret. New vault values are encrypted
+with AES-256-GCM. Existing AES-CBC records remain readable during migration.
 
 For the frontend, create a separate `.env` file in the root directory:
 
@@ -75,7 +80,14 @@ For the frontend, create a separate `.env` file in the root directory:
 
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+# Optional: override the API URL. Defaults to localhost in development
+# and https://passend.onrender.com in production.
+# VITE_API_URL=http://localhost:3000
 ```
+
+The frontend automatically uses `http://localhost:3000` with `npm run dev`
+and `https://passend.onrender.com` in a production build. For another
+deployment, set `VITE_API_URL` in that hosting platform's environment variables.
 
 4. Run the Application
 

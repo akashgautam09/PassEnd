@@ -2,22 +2,42 @@ import Table from './Table'
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 const Manager = () => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (import.meta.env.DEV ? "http://localhost:3000" : "https://passend.onrender.com");
     const { user } = useUser();
+    const { getToken } = useAuth();
     const [showPass, setshowPass] = useState("bi-eye-fill")
     const [form, setform] = useState({ site: "", identifierType: "username", identifier: "", password: "" })
     const [PasswordArray, setPasswordArray] = useState([])
     const [Passtype, setPasstype] = useState("password")
+    const [isSaving, setIsSaving] = useState(false)
+
+    const getErrorMessage = async (response, fallback) => {
+        try {
+            const body = await response.json()
+            return body.error || fallback
+        } catch {
+            return fallback
+        }
+    }
 
     const getPassword = async () => {
         if (!user || !user.id) return;
 
-        let res = await fetch(`${API_URL}/?userId=${user.id}`)
-        let passwords = await res.json()
-        setPasswordArray(passwords)
+        const token = await getToken();
+        try {
+            let res = await fetch(`${API_URL}/`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            if (!res.ok) throw new Error(await getErrorMessage(res, 'Failed to fetch passwords'));
+            let passwords = await res.json()
+            setPasswordArray(passwords)
+        } catch (error) {
+            toast.error('Unable to load your passwords');
+        }
     }
 
     useEffect(() => {
@@ -40,6 +60,7 @@ const Manager = () => {
     }
 
     const handleSubmit = async () => {
+        if (isSaving) return;
         if (!form.site.trim()) {
             toast.error('Please enter a website URL');
             return;
@@ -58,22 +79,32 @@ const Manager = () => {
         }
 
         const id = uuidv4();
-        const newArray = [...PasswordArray, { ...form, id: id, userId: user.id }]
-        setPasswordArray(newArray)
 
-        await fetch(`${API_URL}/`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: form.id, userId: user.id }) })
+        try {
+            setIsSaving(true);
+            const token = await getToken();
+            if (!token) throw new Error('Authentication token unavailable');
+            const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+            if (form.id) {
+                const deleteResponse = await fetch(`${API_URL}/`, { method: "DELETE", headers, body: JSON.stringify({ id: form.id }) })
+                if (!deleteResponse.ok) throw new Error(await getErrorMessage(deleteResponse, 'Failed to update password'));
+            }
 
-        await fetch(`${API_URL}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ...form, id, userId: user.id })
-        })
+            const saveResponse = await fetch(`${API_URL}/`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ ...form, id })
+            })
+            if (!saveResponse.ok) throw new Error(await getErrorMessage(saveResponse, 'Failed to save password'));
 
-        await getPassword();
-        setform({ site: "", identifierType: "username", identifier: "", password: "" })
-        toast.success('Saved successfully!');
+            await getPassword();
+            setform({ site: "", identifierType: "username", identifier: "", password: "" })
+            toast.success('Saved successfully!');
+        } catch (error) {
+            toast.error(error.message || 'Unable to save password');
+        } finally {
+            setIsSaving(false);
+        }
     }
 
     const showPassword = () => {
@@ -146,7 +177,7 @@ const Manager = () => {
                     trigger="hover"
                     style={{ width: "30px", height: "30px" }}>
                     </lord-icon>
-                    <span className="font-serif font-semibold text-lg">Save</span>
+                    <span className="font-serif font-semibold text-lg">{isSaving ? 'Saving...' : 'Save'}</span>
                 </button>
                 <div className='w-full pb-3'>
                     <h1 className='font-bold font-sans text-2xl pb-2 pt-0.5 text-center text-cyan-900'>Your Passwords</h1>

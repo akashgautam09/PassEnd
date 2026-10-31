@@ -1,9 +1,19 @@
 import { ToastContainer, toast } from 'react-toastify';
-import { useUser } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/clerk-react';
 
 const table = (props) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-    const { user } = useUser();
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (import.meta.env.DEV ? "http://localhost:3000" : "https://passend.onrender.com");
+    const { getToken } = useAuth();
+
+    const getErrorMessage = async (response, fallback) => {
+        try {
+            const body = await response.json()
+            return body.error || fallback
+        } catch {
+            return fallback
+        }
+    }
     let passwordData = props.PasswordArray;
 
     const getIdentifierLabel = () => {
@@ -18,10 +28,20 @@ const table = (props) => {
     const deletePassword = async (m) => {
         let c = confirm("Do you really want to delete password !")
         if (c) {
-            props.setPasswordArray(passwordData.filter(item => item.id !== m))
-            await fetch(`${API_URL}/`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: m, userId: user.id }) })
+            try {
+                const token = await getToken();
+                const response = await fetch(`${API_URL}/`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ id: m })
+                })
+                if (!response.ok) throw new Error(await getErrorMessage(response, 'Failed to delete password'));
 
-            toast.success('Password deleted !');
+                props.setPasswordArray(passwordData.filter(item => item.id !== m))
+                toast.success('Password deleted !');
+            } catch (error) {
+                toast.error(error.message || 'Unable to delete password');
+            }
         }
     }
 
