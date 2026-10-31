@@ -1,9 +1,9 @@
 import { ToastContainer, toast } from 'react-toastify';
 import { useAuth } from '@clerk/clerk-react';
 
-const table = (props) => {
+const Table = (props) => {
     const API_URL = import.meta.env.VITE_API_URL ||
-        (import.meta.env.DEV ? "http://localhost:3000" : "https://passend.onrender.com");
+        (import.meta.env.DEV ? "http://localhost:3001" : "https://passend.onrender.com");
     const { getToken } = useAuth();
 
     const getErrorMessage = async (response, fallback) => {
@@ -12,6 +12,15 @@ const table = (props) => {
             return body.error || fallback
         } catch {
             return fallback
+        }
+    }
+
+    const copyText = async (text) => {
+        try {
+            await navigator.clipboard.writeText(text)
+            toast.success('Copied to clipboard')
+        } catch {
+            toast.error('Unable to copy')
         }
     }
     let passwordData = props.PasswordArray;
@@ -56,7 +65,7 @@ const table = (props) => {
         <div>
             <ToastContainer
                 position="bottom-right"
-                autoClose={3000}
+                autoClose={3001}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick={true}
@@ -80,8 +89,8 @@ const table = (props) => {
                         return <tr key={i} className="font-semibold font-sans border-b border-white hover:bg-purple-200 transition">
                             <td className="px-4 py-2">
                                 <div className='flex items-center'>
-                                    <a href={e.site} target='_blank' >{e.site}</a>
-                                    <span className='cursor-pointer' onClick={() => { copytext(e.site) }}><lord-icon
+                                    <a href={e.site} target='_blank' rel='noopener noreferrer'>{e.site}</a>
+                                    <span className='cursor-pointer' onClick={() => { copyText(e.site) }}><lord-icon
                                         style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "6px" }}
                                         src="https://cdn.lordicon.com/iykgtsbt.json"
                                         trigger="hover" >
@@ -92,7 +101,7 @@ const table = (props) => {
                                     <span className='text-xs text-gray-600'>{e.identifierType ? e.identifierType.charAt(0).toUpperCase() + e.identifierType.slice(1) : 'Username'}</span>
                                     <div className='flex items-center'>
                                         {e.identifier || e.username}
-                                        <span className='cursor-pointer' onClick={() => { copytext(e.identifier || e.username) }}><lord-icon
+                                        <span className='cursor-pointer' onClick={() => { copyText(e.identifier || e.username) }}><lord-icon
                                             style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "6px" }}
                                             src="https://cdn.lordicon.com/iykgtsbt.json"
                                             trigger="hover" >
@@ -103,7 +112,7 @@ const table = (props) => {
                             <td className="px-4 py-2">
                                 <div className='flex items-center'>
                                     {e.password}
-                                    <span className='cursor-pointer' onClick={() => { copytext(e.password) }}><lord-icon
+                                    <span className='cursor-pointer' onClick={() => { copyText(e.password) }}><lord-icon
                                         style={{ "width": "25px", "height": "25px", "paddingTop": "3px", "paddingLeft": "6px" }}
                                         src="https://cdn.lordicon.com/iykgtsbt.json"
                                         trigger="hover" >
@@ -131,4 +140,4 @@ const table = (props) => {
     )
 }
 
-export default table
+export default Table

@@ -82,10 +82,10 @@ For the frontend, create a separate `.env` file in the root directory:
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 # Optional: override the API URL. Defaults to localhost in development
 # and https://passend.onrender.com in production.
-# VITE_API_URL=http://localhost:3000
+# VITE_API_URL=http://localhost:3001
 ```
 
-The frontend automatically uses `http://localhost:3000` with `npm run dev`
+The frontend automatically uses `http://localhost:3001` with `npm run dev`
 and `https://passend.onrender.com` in a production build. For another
 deployment, set `VITE_API_URL` in that hosting platform's environment variables.
 

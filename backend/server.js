@@ -5,11 +5,12 @@ const cors = require('cors')
 const { clerkMiddleware, getAuth } = require('@clerk/express');
 const { encrypt, decrypt, validateEncryptionKey } = require('./crypto');
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3001
 
 app.use(express.json())
 
 const allowedOrigins = [
+  "http://localhost:3001",
   "https://passend.vercel.app"
 ];
 
