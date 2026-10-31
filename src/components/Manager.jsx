@@ -6,7 +6,7 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 
 const Manager = () => {
     const API_URL = import.meta.env.VITE_API_URL ||
-        (import.meta.env.DEV ? "http://localhost:3000" : "https://passend.onrender.com");
+        (import.meta.env.DEV ? "http://localhost:3001" : "https://passend.onrender.com");
     const { user } = useUser();
     const { getToken } = useAuth();
     const [showPass, setshowPass] = useState("bi-eye-fill")
@@ -35,7 +35,7 @@ const Manager = () => {
             if (!res.ok) throw new Error(await getErrorMessage(res, 'Failed to fetch passwords'));
             let passwords = await res.json()
             setPasswordArray(passwords)
-        } catch (error) {
+        } catch {
             toast.error('Unable to load your passwords');
         }
     }
@@ -78,20 +78,15 @@ const Manager = () => {
             return;
         }
 
-        const id = uuidv4();
+        const id = form.id || uuidv4();
 
         try {
             setIsSaving(true);
             const token = await getToken();
             if (!token) throw new Error('Authentication token unavailable');
             const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-            if (form.id) {
-                const deleteResponse = await fetch(`${API_URL}/`, { method: "DELETE", headers, body: JSON.stringify({ id: form.id }) })
-                if (!deleteResponse.ok) throw new Error(await getErrorMessage(deleteResponse, 'Failed to update password'));
-            }
-
             const saveResponse = await fetch(`${API_URL}/`, {
-                method: 'POST',
+                method: form.id ? 'PATCH' : 'POST',
                 headers,
                 body: JSON.stringify({ ...form, id })
             })

@@ -58,7 +58,6 @@ const Table = (props) => {
         console.log("Editing password with id ", id)
         let editarr = passwordData.filter(i => i.id === id)[0]
         props.setform({ ...editarr, id: id })
-        props.setPasswordArray(passwordData.filter(item => item.id !== id))
     }
 
     return (

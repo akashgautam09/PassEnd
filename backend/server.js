@@ -4,10 +4,24 @@ const { MongoClient } = require('mongodb');
 const cors = require('cors')
 const { clerkMiddleware, getAuth } = require('@clerk/express');
 const { encrypt, decrypt, validateEncryptionKey } = require('./crypto');
-const app = express()
 const port = process.env.PORT || 3001
+const mongoUri = process.env.MONGO_URI
 
-app.use(express.json())
+if (!mongoUri) {
+  throw new Error('MONGO_URI is required')
+}
+
+const app = express()
+let httpServer
+let isDatabaseReady = false
+
+app.use(express.json({ limit: '10kb' }))
+
+app.get('/health', (req, res) => {
+  res.status(isDatabaseReady ? 200 : 503).json({
+    status: isDatabaseReady ? 'ready' : 'starting'
+  })
+})
 
 const allowedOrigins = [
   "http://localhost:3001",
@@ -28,16 +42,35 @@ app.use(cors({
 app.use(clerkMiddleware())
 
 // Connection URL
-const client = new MongoClient(process.env.MONGO_URI);
+const client = new MongoClient(mongoUri);
 
 // Database Name
 const dbName = 'PassEnd';
+const allowedIdentifierTypes = ['username', 'email', 'phone'];
+const maxFieldLengths = {
+  id: 100,
+  site: 2048,
+  identifier: 512,
+  password: 1024
+};
 
-validateEncryptionKey();
-
-client.connect()
-  .then(() => console.log("Successfully connected to MongoDB"))
-  .catch(err => console.error("MongoDB connection error:", err));
+const isValidPasswordEntry = ({ id, site, identifierType, identifier, password }) => {
+  return (
+    typeof id === 'string' &&
+    typeof site === 'string' &&
+    typeof identifier === 'string' &&
+    typeof password === 'string' &&
+    allowedIdentifierTypes.includes(identifierType) &&
+    id.trim().length > 0 &&
+    site.trim().length > 0 &&
+    identifier.trim().length > 0 &&
+    password.length > 0 &&
+    id.length <= maxFieldLengths.id &&
+    site.length <= maxFieldLengths.site &&
+    identifier.length <= maxFieldLengths.identifier &&
+    password.length <= maxFieldLengths.password
+  )
+}
 
 app.get('/', async (req, res) => {
   try {
@@ -69,17 +102,7 @@ app.post('/', async (req, res) => {
     if (!userId) return res.status(401).json({ error: "Authentication required" });
 
     const { id, site, identifierType, identifier, password } = req.body;
-    const allowedIdentifierTypes = ['username', 'email', 'phone'];
-    if (
-      typeof id !== 'string' ||
-      typeof site !== 'string' ||
-      typeof identifier !== 'string' ||
-      typeof password !== 'string' ||
-      !allowedIdentifierTypes.includes(identifierType) ||
-      !site.trim() ||
-      !identifier.trim() ||
-      !password
-    ) {
+    if (!isValidPasswordEntry(req.body)) {
       return res.status(400).json({ error: "Invalid password entry" });
     }
 
@@ -102,6 +125,42 @@ app.post('/', async (req, res) => {
   }
 });
 
+app.patch('/', async (req, res) => {
+  try {
+    const { userId } = getAuth(req);
+    if (!userId) return res.status(401).json({ error: "Authentication required" });
+
+    const { id, site, identifierType, identifier, password } = req.body;
+    if (!isValidPasswordEntry(req.body)) {
+      return res.status(400).json({ error: "Invalid password entry" });
+    }
+
+    const db = client.db(dbName);
+    const collection = db.collection('passwords');
+    const updateResult = await collection.updateOne(
+      { id, userId },
+      {
+        $set: {
+          site: encrypt(site.trim()),
+          identifierType,
+          identifier: encrypt(identifier.trim()),
+          username: encrypt(identifier.trim()),
+          password: encrypt(password)
+        }
+      }
+    );
+
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).json({ error: "Password entry not found" });
+    }
+
+    res.send({ success: true });
+  } catch (error) {
+    console.error("Failed to update password:", error.message);
+    res.status(500).json({ error: "Failed to update" });
+  }
+});
+
 app.delete('/', async (req, res) => {
   try {
     const { userId } = getAuth(req);
@@ -113,6 +172,9 @@ app.delete('/', async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection('passwords');
     const deleteResult = await collection.deleteOne({ id, userId });
+    if (deleteResult.deletedCount === 0) {
+      return res.status(404).json({ error: "Password entry not found" });
+    }
     res.send({ success: true, result: deleteResult })
   } catch (error) {
     console.error("Failed to delete password:", error.message);
@@ -120,6 +182,36 @@ app.delete('/', async (req, res) => {
   }
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`)
+const shutdown = async (signal) => {
+  if (httpServer) {
+    await new Promise(resolve => httpServer.close(resolve))
+  }
+  await client.close()
+  console.log(`Shutdown complete after ${signal}`)
+}
+
+process.once('SIGINT', () => shutdown('SIGINT'))
+process.once('SIGTERM', () => shutdown('SIGTERM'))
+
+const startServer = async () => {
+  validateEncryptionKey()
+  await client.connect()
+  isDatabaseReady = true
+  console.log("Successfully connected to MongoDB")
+
+  httpServer = app.listen(port, () => {
+    console.log(`Example app listening on port http://localhost:${port}`)
+  })
+
+  httpServer.on('error', async (error) => {
+    console.error("HTTP server error:", error.message)
+    await client.close()
+    process.exitCode = 1
+  })
+}
+
+startServer().catch(async (error) => {
+  console.error("Backend startup failed:", error.message)
+  await client.close().catch(() => {})
+  process.exitCode = 1
 })
