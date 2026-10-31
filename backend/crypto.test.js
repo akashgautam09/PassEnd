@@ -48,4 +48,6 @@ test('reads legacy AES-CBC values', () => {
 
 test('rejects malformed encrypted values', () => {
   assert.throws(() => decrypt('gcm:bad:value'));
+  assert.throws(() => decrypt('gcm:00112233445566778899aabb:zz'.padEnd(67, '0')));
+  assert.throws(() => decrypt('00112233445566778899aabb:abc'));
 });

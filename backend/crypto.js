@@ -4,6 +4,18 @@ require('dotenv').config();
 const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 
+function decodeHex(value, expectedBytes, allowEmpty = false) {
+    if (typeof value !== 'string' || (!allowEmpty && value.length === 0) || value.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(value)) {
+        throw new Error('Invalid encrypted value');
+    }
+
+    const decoded = Buffer.from(value, 'hex');
+    if (expectedBytes !== undefined && decoded.length !== expectedBytes) {
+        throw new Error('Invalid encrypted value');
+    }
+    return decoded;
+}
+
 function getEncryptionKey() {
     const value = process.env.ENCRYPTION_KEY;
     if (!value) {
@@ -40,12 +52,9 @@ function decrypt(text) {
         if (parts.length !== 4) {
             throw new Error('Invalid encrypted value');
         }
-        const iv = Buffer.from(parts[1], 'hex');
-        const authTag = Buffer.from(parts[2], 'hex');
-        const encrypted = Buffer.from(parts[3], 'hex');
-        if (iv.length !== IV_LENGTH || authTag.length !== AUTH_TAG_LENGTH) {
-            throw new Error('Invalid encrypted value');
-        }
+        const iv = decodeHex(parts[1], IV_LENGTH);
+        const authTag = decodeHex(parts[2], AUTH_TAG_LENGTH);
+        const encrypted = decodeHex(parts[3], undefined, true);
         const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
         decipher.setAuthTag(authTag);
         return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
@@ -55,11 +64,8 @@ function decrypt(text) {
     if (parts.length !== 2) {
         throw new Error('Invalid encrypted value');
     }
-    const iv = Buffer.from(parts[0], 'hex');
-    const encrypted = Buffer.from(parts[1], 'hex');
-    if (iv.length !== 16) {
-        throw new Error('Invalid encrypted value');
-    }
+    const iv = decodeHex(parts[0], 16);
+    const encrypted = decodeHex(parts[1]);
     const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString('utf8');
 }
